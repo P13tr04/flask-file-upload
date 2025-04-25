@@ -1,0 +1,11 @@
+=== RESUMEN DE ANÁLISIS ===
+
+ Archivo: songs.txt
+ Extensión: .txt
+ Tamaño: 0.75 KB (769 bytes)
+ Fecha de creación: 2025-04-25 14:08:29
+
+ ESTADÍSTICAS:
+→ Líneas: 17
+→ Palabras: 137
+→ Caracteres: 736

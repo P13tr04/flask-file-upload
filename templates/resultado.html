@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados del Análisis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1> Resultados del Análisis</h1>
+        
+        <div class="result-card">
+            <div class="result-item"><strong> Archivo:</strong> {{ resultado.nombre }}</div>
+            <div class="result-item"><strong> Extensión:</strong> {{ resultado.extension }}</div>
+            <div class="result-item"><strong> Tamaño:</strong> {{ resultado.peso_kb }} KB ({{ resultado.peso_bytes }} bytes)</div>
+            <div class="result-item"><strong> Fecha de creación:</strong> {{ resultado.fecha_creacion }}</div>
+            
+            <h3 style="margin-top: 20px;"> Estadísticas:</h3>
+            <div class="result-item">→ Líneas: {{ resultado.num_lineas }}</div>
+            <div class="result-item">→ Palabras: {{ resultado.num_palabras }}</div>
+            <div class="result-item">→ Caracteres: {{ resultado.num_caracteres }}</div>
+        </div>
+        
+        <p style="text-align: center; font-weight: 600;">Resumen guardado en: <strong>{{ archivo_resumen }}</strong></p>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <a href="{{ url_for('descargar', filename=archivo_resumen) }}" class="btn btn-download"> Descargar Resumen</a>
+            <a href="{{ url_for('index') }}" class="btn btn-another"> Analizar Otro</a>
+        </div>
+    </div>
+</body>
+</html>
