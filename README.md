@@ -19,9 +19,9 @@ analizador_archivos/
 ├── app.py                # Nueva lógica de historial
 ├── static/
 │   └── css/
-│       └── styles.css    # Estilos actualizados
+│       └── styles.css    
 ├── templates/
-│   ├── index.html        # Nueva sección de historial
+│   ├── index.html        # Nueva sección de historial + estilos
 │   └── resultado.html    
 └── uploads/              
 └── analysis_history.json       # Almacenamiento de registros (nuevo)
