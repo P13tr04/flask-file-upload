@@ -31,7 +31,7 @@ analizador_archivos/
 
 ### Próximas Características
 - 🔎 Búsqueda en historial
-- 📈 Gráficos estadísticos interactivos
+- 📈 Visualización de información previa
 - 🗑️ Opción para borrar registros del historial
 - 📤 Exportar historial completo a CSV
 
