@@ -1,78 +1,46 @@
-# 📄 Analizador de Archivos de Texto
-Una aplicación web desarrollada en Flask que analiza archivos de texto, mostrando sus metadatos y estadísticas de contenido, con interfaz optimizada para móviles.
+# 📄 Analizador de Archivos de Texto (Fork Mejorado)
+Aplicación web en Flask para análisis de archivos de texto con nuevas funcionalidades y mejoras. Fork del proyecto original con características adicionales.
 
-## 🌟 Características principales
+## 🌟 Características agregadas
 
-- 🔍 Analiza cualquier archivo de texto
-- 📊 Proporciona información detallada:
-  - 📝 Extensión y tamaño del archivo
-  - 📅 Fecha de creación
-  - 📈 Estadísticas de contenido (líneas, palabras, caracteres)
-- 📥 Genera un resumen descargable
-- 📱 Interfaz responsive optimizada para móviles
-- 🎨 Diseño moderno con CSS personalizado
+### Nuevas Funcionalidades
+- 🕒 **Historial de análisis**:
+  - Muestra los últimos 10 archivos analizados
+  - Detalles por archivo:
+    - 📛 Nombre del archivo
+    - 📆 Fecha y hora de análisis
+    - 📦 Tipo de archivo
+    - ⚖️ Peso del archivo
 
-## 🚀 Instalación y uso
-
-### Requisitos previos
-- Python 3.8+
-- pip (Gestor de paquetes de Python)
-
-### Pasos para ejecutar
-
-1. **Clonar el repositorio**
-   ```bash
-   git clone https://github.com/P13tr0/Mis-Proyectos.git analizador-archivos
-   cd analizador-archivos
-   ```
-
-2. **Instalar dependencias**
-   ```bash
-   pip install flask werkzeug
-   ```
-
-3. **Ejecutar la aplicación**
-   ```bash
-   python app.py
-   ```
-
-4. **Acceder desde el navegador**
-   - Computadora: `http://localhost:5000`
-   - Teléfono (misma red WiFi): `http://<ip-local>:5000`
-
-## 🛠 Estructura del proyecto
+## 🛠 Estructura Actualizada del Proyecto
 
 ```
 analizador_archivos/
-├── app.py                # Aplicación principal Flask
+├── app.py                # Nueva lógica de historial
 ├── static/
 │   └── css/
-│       └── styles.css    # Estilos CSS personalizados
+│       └── styles.css    
 ├── templates/
-│   ├── index.html        # Página de inicio
-│   └── resultado.html    # Página de resultados
-└── uploads/              # Directorio para archivos subidos
+│   ├── index.html        # Nueva sección de historial + estilos
+│   └── resultado.html    
+└── uploads/              
+└── analysis_history.json       # Almacenamiento de registros (nuevo)
 ```
 
---------------
+## 🚧 Futuras Mejoras Planeadas
 
-## 🌐 Cómo acceder desde diferentes dispositivos
+### Próximas Características
+- 🔎 Búsqueda en historial
+- 📈 Visualización de información previa
+- 🗑️ Opción para borrar registros del historial
+- 📤 Exportar historial completo a CSV
 
-### En la misma red local:
-1. Conecta todos los dispositivos a la misma red WiFi
-2. Ejecuta la aplicación con:
-   ```bash
-   python app.py
-   ```
-3. Accede desde otros dispositivos usando la IP de tu computadora:
-   ```
-   http://<tu-ip-local>:5000
-   ```
 
-### Desde cualquier lugar usando ngrok:
-1. Descarga ngrok desde https://ngrok.com/download
-2. Ejecuta:
-   ```bash
-   ./ngrok http 5000
-   ```
-3. Comparte la URL generada (ej: `https://abcd1234.ngrok.io`)
+## 🌐 Cómo Acceder y Usar el Historial
+
+El panel de historial está disponible directamente en la página principal:
+1. Sube un archivo para análisis
+2. Desplázate hacia abajo en la página inicial
+3. Encuentra la sección "Mostrar Historial"
+4. Visualiza detalles de análisis anteriores
+5. Los registros se actualizan automáticamente

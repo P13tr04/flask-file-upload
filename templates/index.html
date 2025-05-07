@@ -19,7 +19,7 @@
                 <label for="archivo">Selecciona un archivo:</label>
                 <input type="file" name="archivo" id="archivo" required>
             </div>
-            
+            <p> Archivos permitidos: .txt, .csv, .log, .json.<br>
             <div class="form-group">
                 <label for="nombre_salida">Nombre del resumen:</label>
                 <input type="text" name="nombre_salida" id="nombre_salida" value="resumen.txt">
@@ -27,6 +27,80 @@
             
             <button type="submit" class="btn btn-primary">Analizar Archivo</button>
         </form>
+        <button onclick="toggleHistorial()" class="btn-historial">
+            <span id="historialIcon">▼</span> Mostrar Historial
+        </button>
+        <div id="historialContainer" class="historial-collapsed">
+            <div class=""historial-section">
+                <h3>Historial de analisis</h3>
+                <div class="historial-list">
+                    {% for item in historial %}
+                    <div class="historial-item">
+                        <div class="historial-header">
+                            <span class="nombre-archivo">{{ item.nombre}}</span>
+                            <span class="fecha">{{ item.fecha|datetime_format }}</span>
+                        </div>
+                        <div class="detalles">
+                            <span class="tipo">{{ item.tipo}}</span>
+                            <span class="tamaño">{{ item.tamaño}} KB</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- <a href="/historial" class="ver-mas">Ver historial completo</a> -->
+            </div>
+        </div>
     </div>
 </body>
 </html>
+<style>
+    /* Estilos para el boton de historial */
+    .historial-collapsed {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+    
+    .historial-expanded {
+        max-height: 600px; /* Altura máxima aproximada */
+        transition: max-height 0.3s ease-in;
+    }
+    
+    .btn-historial {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-historial:hover {
+        background: #0056b3;
+    }
+    
+    #historialIcon {
+        transition: transform 0.3s;
+    }
+    </style>
+    
+    <script>
+    function toggleHistorial() {
+        const container = document.getElementById('historialContainer');
+        const icon = document.getElementById('historialIcon');
+        
+        if(container.classList.contains('historial-collapsed')) {
+            container.classList.remove('historial-collapsed');
+            container.classList.add('historial-expanded');
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            container.classList.remove('historial-expanded');
+            container.classList.add('historial-collapsed');
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+    </script>
