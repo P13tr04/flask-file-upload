@@ -27,7 +27,7 @@ analizador_archivos/
 └── analysis_history.json       # Almacenamiento de registros (nuevo)
 ```
 
-## 🚧 Futuras Mejuras Planeadas
+## 🚧 Futuras Mejoras Planeadas
 
 ### Próximas Características
 - 🔎 Búsqueda en historial
