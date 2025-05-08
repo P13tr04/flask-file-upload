@@ -1,95 +1,129 @@
-from flask import Flask, render_template, request, send_file
-import os
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_talisman import Talisman
+import os
+from datetime import date
+import magic
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
+# Configuración de seguridad HTTPS
+talisman = Talisman(
+    app,
+    content_security_policy=None,
+    force_https=os.environ.get('ENV') == 'production'
+)
 
-# Crear directorios necesarios
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+# Configuración para proxy inverso de Render
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
-def analizar_archivo(ruta_archivo):
-    """Analiza el archivo y devuelve sus datos"""
-    nombre = os.path.basename(ruta_archivo)
-    nombre_base, extension = os.path.splitext(nombre)
-    peso = os.path.getsize(ruta_archivo)
-    fecha_creacion = datetime.fromtimestamp(os.path.getctime(ruta_archivo)).strftime('%Y-%m-%d %H:%M:%S')
-    
-    num_lineas = num_palabras = num_caracteres = 0
-    
-    with open(ruta_archivo, 'r', encoding='utf-8') as archivo:
-        for linea in archivo:
-            num_lineas += 1
-            num_caracteres += len(linea)
-            num_palabras += len(linea.split())
-    
-    return {
-        'nombre': nombre,
-        'extension': extension,
-        'peso_bytes': peso,
-        'peso_kb': round(peso/1024, 2),
-        'fecha_creacion': fecha_creacion,
-        'num_lineas': num_lineas,
-        'num_palabras': num_palabras,
-        'num_caracteres': num_caracteres
-    }
+# Configuraciones de la aplicación
+app.config['MAX_CONTENT_LENGTH'] = 10 * (1024**2)  # 10 MiB
+ALLOWED_MIME_TYPES = {'text/plain', 'text/csv', 'application/json'}
+PREVIEW_LINES = 10  # Número de líneas para la previsualización
 
-def generar_resumen(resultado):
-    """Genera el contenido del archivo de resumen"""
-    return f"""=== RESUMEN DE ANÁLISIS ===
+def validar_file(archivo):
+    try:
+        # Leer solo los primeros bytes para MIME type
+        header = archivo.stream.read(2048)
+        archivo.stream.seek(0)
+        mime_type = magic.from_buffer(header, mime=True)
 
- Archivo: {resultado['nombre']}
- Extensión: {resultado['extension']}
- Tamaño: {resultado['peso_kb']} KB ({resultado['peso_bytes']} bytes)
- Fecha de creación: {resultado['fecha_creacion']}
+        # Verificar extensión
+        filename = secure_filename(archivo.filename)
+        if '.' not in filename:
+            return False
 
- ESTADÍSTICAS:
-→ Líneas: {resultado['num_lineas']}
-→ Palabras: {resultado['num_palabras']}
-→ Caracteres: {resultado['num_caracteres']}"""
+        extension = filename.rsplit('.', 1)[1].lower()
+        return (
+            extension in app.config['ALLOWED_EXTENSIONS'] and
+            mime_type in app.config['ALLOWED_MIME_TYPES']
+        )
+
+    except Exception as e:
+        app.logger.error(f'Error validación: {str(e)}')
+        return False
+
+def convert_size(size):
+    if size == 0:
+        return "0B"
+
+    units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB"]
+    for unit in units:
+        if size < 1024:
+            break
+        size /= 1024
+    return f"{size:.2f} {unit}"
+
+def get_preview(content):
+    """Obtiene las primeras líneas del contenido para previsualización"""
+    lines = content.splitlines()
+    preview_lines = lines[:PREVIEW_LINES]
+    return '\n'.join(preview_lines)
 
 @app.route('/', methods=['GET', 'POST'])
-def index():
+def upload_file():
     if request.method == 'POST':
-        if 'archivo' not in request.files:
-            return render_template('index.html', error=" No se seleccionó ningún archivo")
-            
-        archivo = request.files['archivo']
-        
-        if archivo.filename == '':
-            return render_template('index.html', error=" El archivo está vacío")
-        
-        if archivo:
-            filename = secure_filename(archivo.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            archivo.save(filepath)
-            
-            try:
-                resultado = analizar_archivo(filepath)
-                nombre_salida = request.form.get('nombre_salida', 'resumen.txt')
-                
-                if not nombre_salida.endswith('.txt'):
-                    nombre_salida += '.txt'
-                
-                resumen_path = os.path.join(app.config['UPLOAD_FOLDER'], nombre_salida)
-                with open(resumen_path, 'w', encoding='utf-8') as f:
-                    f.write(generar_resumen(resultado))
-                
-                return render_template('resultado.html', 
-                                    resultado=resultado,
-                                    archivo_resumen=nombre_salida)
-            
-            except Exception as e:
-                return render_template('index.html', error=f" Error: {str(e)}")
-    
-    return render_template('index.html')
+        if 'file' not in request.files:
+            flash('No se encontró el archivo')
+            return redirect(request.url)
 
-@app.route('/descargar/<filename>')
-def descargar(filename):
-    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    return send_file(path, as_attachment=True)
+        file = request.files['file']
+
+        if file.filename == '':
+            flash('No se seleccionó ningún archivo')
+            return redirect(request.url)
+
+        if file:
+            filename = secure_filename(file.filename)
+            file_type = file.mimetype
+
+            # Validación MIME type estricta
+            if file_type not in ALLOWED_MIME_TYPES:
+                flash('Tipo de archivo no permitido')
+                return redirect(request.url)
+
+            # Calcular tamaño
+            file.seek(0, os.SEEK_END)
+            size_bytes = file.tell()
+            file.seek(0)
+
+            try:
+                datefile = date.today()
+                content = file.read().decode('UTF-8')
+                lines = len(content.splitlines())
+                words = len(content.split())
+                characters = len(content)
+                preview = get_preview(content)
+
+                return render_template('result.html',
+                                    filename=filename,
+                                    file_type=file_type,
+                                    date=datefile,
+                                    size=convert_size(size_bytes),
+                                    lines=lines,
+                                    words=words,
+                                    characters=characters,
+                                    preview=preview)
+
+            except UnicodeDecodeError:
+                flash('El archivo no es texto válido')
+                return redirect(request.url)
+            except Exception as e:
+                flash('Error procesando archivo')
+                app.logger.error(f'Error: {str(e)}')
+                return redirect(request.url)
+
+    return render_template('upload.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    if os.environ.get('ENV') == 'production':
+        from waitress import serve
+        serve(app, host='0.0.0.0', port=8080)
+    else:
+        app.run(host='0.0.0.0', port=8080, debug=True)

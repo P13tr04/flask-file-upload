@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <div class="mb-3">
+
+                <label class="form-label">Selecciona un archivo de texto:</label>
+
+                <input type="file" class="form-control" name="file" accept=".txt" required>
+
+                <div class="form-text">Formatos permitidos: TXT (hasta 5MB)</div>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary">Analizar</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

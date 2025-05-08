@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados del Análisis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Resultados del Análisis</h1>
+        
+        <div class="result-card">
+            <div class="result-item"><strong>Archivo:</strong> {{ filename }}</div>
+            <div class="result-item"><strong>Tipo de archivo (MIME Type):</strong> {{ file_type }}</div>
+            <div class="result-item"><strong>Fecha de análisis:</strong> {{ date }}</div>
+            <div class="result-item"><strong>Tamaño del archivo:</strong> {{ size }} ({{ size_bytes }} bytes)</div>
+            
+            <h3 style="margin-top: 20px;">Estadísticas del archivo:</h3>
+            <div class="result-item">→ Líneas: {{ lines }}</div>
+            <div class="result-item">→ Palabras: {{ words }}</div>
+            <div class="result-item">→ Caracteres: {{ characters }}</div>
+        </div>
+        
+        <h3>Previsualización:</h3>
+        <pre style="background-color: #f4f4f4; padding: 10px; border: 1px solid #ddd; border-radius: 5px; max-height: 200px; overflow-y: auto;">{{ preview }}</pre>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <a href="{{ url_for('upload_file') }}" class="btn btn-another">Analizar Otro Archivo</a>
+        </div>
+    </div>
+</body>
+</html>
